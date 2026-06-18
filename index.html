@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Janelle Sampson — Machine Learning & Software Engineer</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300..700&display=swap" rel="stylesheet" />
+
+  <!-- Turn the deck on as early as possible so the page never flashes the
+       stacked fallback. If JS is disabled, this never runs and the page
+       falls back to a normal scroll (progressive enhancement). -->
+  <script>document.documentElement.classList.add('deck-on');</script>
+
+  <style>
+    /* ============================================================
+       1. DESIGN TOKENS
+       ============================================================ */
+    :root {
+      --font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      --bg: #050308; --bg-elev: #0e0b16;
+      --neb-1: rgba(99,102,241,0.20); --neb-2: rgba(168,85,247,0.16); --neb-3: rgba(20,120,180,0.16);
+      --text: #f5f5f7; --text-dim: #a1a1aa; --text-faint: #6b6b76;
+      --accent: #6aa8ff; --accent-2: #b388ff;
+      --border: rgba(255,255,255,0.08); --radius: 18px; --maxw: 1080px;
+      --ease: cubic-bezier(0.16, 1, 0.30, 1);
+      --jump: 0.72s;            /* hyperspace jump duration */
+    }
+
+    /* ============================================================
+       2. RESET & BASE
+       ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { -webkit-font-smoothing: antialiased; }
+    body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden; }
+    a { color: inherit; text-decoration: none; }
+
+    /* deck mode: the document itself never scrolls — screens swap in place */
+    html.deck-on, html.deck-on body { height: 100%; overflow: hidden; }
+
+    /* ============================================================
+       3. GALACTIC BACKGROUND
+       ============================================================ */
+    .nebula {
+      position: fixed; inset: 0; z-index: -2; pointer-events: none;
+      background:
+        radial-gradient(60vw 60vw at 18% 12%, var(--neb-1), transparent 60%),
+        radial-gradient(55vw 55vw at 85% 28%, var(--neb-2), transparent 60%),
+        radial-gradient(75vw 75vw at 50% 105%, var(--neb-3), transparent 60%);
+      animation: neb-drift 44s var(--ease) infinite alternate;
+    }
+    @keyframes neb-drift { to { transform: translate3d(0, -4vh, 0) scale(1.08); } }
+    #stars { position: fixed; inset: 0; z-index: -1; pointer-events: none; display: block; }
+
+    /* ============================================================
+       4. SCREENS  +  FORWARD HYPERSPACE JUMP
+       ────────────────────────────────────────────────────────
+       Each .screen is a full-viewport layer. Only .active is shown;
+       the rest are visibility:hidden, so sections NEVER share the
+       screen. On a jump:
+         • the new screen runs jump-in  — emerges from depth
+           (scale 0.6 -> 1, blur -> sharp): you fly INTO it.
+         • the old screen runs jump-out — rushes forward and blurs
+           past you (scale 1 -> 1.5, fades).
+       Then it locks at rest until the next scroll. A section taller
+       than the viewport scrolls inside itself; the jump only fires
+       at its top/bottom edge.
+       ============================================================ */
+    .screen { position: relative; }
+    .screen-inner {
+      min-height: 100vh; width: 100%;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 100px 24px;
+    }
+    .screen-inner.centered { align-items: center; text-align: center; }
+    .wrap { width: 100%; max-width: var(--maxw); margin: 0 auto; }
+
+    .deck-on .screen {
+      position: fixed; inset: 0; overflow-y: auto; overflow-x: hidden;
+      -webkit-overflow-scrolling: touch; scrollbar-width: none;
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transform-origin: center center; will-change: transform, opacity, filter;
+    }
+    .deck-on .screen::-webkit-scrollbar { width: 0; height: 0; }
+    .deck-on .screen.active { opacity: 1; visibility: visible; pointer-events: auto; z-index: 2; }
+    .deck-on .screen.is-entering { animation: jump-in var(--jump) var(--ease) both; }
+    .deck-on .screen.is-leaving { visibility: visible; pointer-events: none; z-index: 1; animation: jump-out var(--jump) var(--ease) both; }
+
+    @keyframes jump-in {
+      0%   { opacity: 0; transform: scale(0.6);  filter: blur(9px); }
+      55%  { opacity: 1; }
+      100% { opacity: 1; transform: scale(1);    filter: blur(0); }
+    }
+    @keyframes jump-out {
+      0%   { opacity: 1; transform: scale(1);    filter: blur(0); }
+      100% { opacity: 0; transform: scale(1.5);  filter: blur(12px); }
+    }
+
+    .eyebrow { font-size: 0.8rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+    h2 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 32px; }
+
+    /* ============================================================
+       5. NAV
+       ============================================================ */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 24px; border-bottom: 1px solid transparent;
+      transition: background 0.4s var(--ease), border-color 0.4s var(--ease);
+    }
+    nav.scrolled {
+      background: rgba(5,3,8,0.65);
+      backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-name { font-weight: 600; letter-spacing: -0.01em; }
+    .nav-links { display: flex; gap: 28px; }
+    .nav-links a { font-size: 0.92rem; color: var(--text-dim); transition: color 0.25s var(--ease); }
+    .nav-links a:hover { color: var(--text); }
+    @media (max-width: 640px) { .nav-links { display: none; } }
+
+    /* ============================================================
+       6. SECTION DOTS
+       ============================================================ */
+    .dots { position: fixed; right: 26px; top: 50%; transform: translateY(-50%); z-index: 90; display: flex; flex-direction: column; gap: 14px; }
+    .dots a { width: 9px; height: 9px; border-radius: 50%; background: var(--border); transition: all 0.3s var(--ease); }
+    .dots a:hover { background: var(--text-dim); }
+    .dots a.active { background: var(--accent); transform: scale(1.4); box-shadow: 0 0 12px var(--accent); }
+    @media (max-width: 760px) { .dots { display: none; } }
+
+    /* ============================================================
+       7. HERO
+       ============================================================ */
+    .hero-eyebrow { font-size: 0.85rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 24px; }
+    .hero h1 {
+      font-size: clamp(3rem, 11vw, 8rem); font-weight: 600; letter-spacing: -0.03em; line-height: 1.0;
+      background: linear-gradient(120deg, var(--text) 40%, var(--accent-2));
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .buzz { margin-top: 28px; font-size: clamp(1rem, 2.6vw, 1.5rem); font-weight: 300; color: var(--text-dim); letter-spacing: 0.02em; }
+
+    .rise { opacity: 0; transform: translateY(28px); animation: rise 1s var(--ease) forwards; }
+    .rise:nth-child(1) { animation-delay: 0.05s; }
+    .rise:nth-child(2) { animation-delay: 0.20s; }
+    .rise:nth-child(3) { animation-delay: 0.35s; }
+    @keyframes rise { to { opacity: 1; transform: none; } }
+
+    .scroll-cue {
+      position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--text-faint);
+      opacity: 0; animation: rise 1s var(--ease) 0.5s forwards;
+    }
+    .scroll-cue .line { width: 1px; height: 40px; background: linear-gradient(var(--text-faint), transparent); transform-origin: top; animation: cue 1.9s var(--ease) infinite; }
+    @keyframes cue { 0%{transform:scaleY(0);transform-origin:top;} 45%{transform:scaleY(1);transform-origin:top;} 55%{transform:scaleY(1);transform-origin:bottom;} 100%{transform:scaleY(0);transform-origin:bottom;} }
+
+    /* ============================================================
+       8. ABOUT
+       ============================================================ */
+    .about-text { font-size: clamp(1.4rem, 3.4vw, 2.3rem); font-weight: 300; line-height: 1.45; color: var(--text-dim); max-width: 820px; margin: 0 auto; }
+    .about-text strong { color: var(--text); font-weight: 500; }
+
+    /* ============================================================
+       9. PROJECTS — chronological timeline
+       ============================================================ */
+    .timeline { position: relative; padding-left: 150px; margin-top: 8px; }
+    .tl-line { position: absolute; left: 108px; top: 8px; bottom: 8px; width: 2px; background: linear-gradient(var(--accent), var(--accent-2)); transform-origin: top; }
+    .deck-on .tl-line { transform: scaleY(0); transition: transform 1s var(--ease) 0.25s; }
+    .deck-on .screen.active .tl-line { transform: scaleY(1); }
+    .tl-item { position: relative; padding-bottom: 30px; }
+    .tl-item:last-child { padding-bottom: 0; }
+    .tl-year { position: absolute; left: -150px; top: 2px; width: 84px; text-align: right; color: var(--accent); font-weight: 600; font-size: 0.95rem; }
+    .tl-dot { position: absolute; left: -48px; top: 6px; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 14px var(--accent); border: 2px solid var(--bg); }
+    .tl-card { background: var(--bg-elev); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 26px; transition: transform 0.4s var(--ease), border-color 0.4s var(--ease); }
+    .tl-card:hover { transform: translateX(6px); border-color: rgba(255,255,255,0.18); }
+    .tl-card h3 { font-size: 1.2rem; font-weight: 600; margin-bottom: 8px; }
+    .tl-card p { color: var(--text-dim); font-size: 0.95rem; margin-bottom: 14px; }
+    .tl-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .tl-tags span {
+      font-size: 0.75rem; font-weight: 600; letter-spacing: 0.01em;
+      color: #0a0712; padding: 5px 13px; border-radius: 100px; border: none;
+      background: linear-gradient(120deg, var(--accent), var(--accent-2));
+      box-shadow: 0 2px 14px rgba(120,140,255,0.25);
+      transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease);
+    }
+    .tl-tags span:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(150,140,255,0.45); }
+    .tl-card .link { font-size: 0.88rem; color: var(--accent); font-weight: 500; }
+    .tl-card .link:hover { text-decoration: underline; }
+
+    /* ============================================================
+       9b. EDUCATION — one entry card per institution / degree
+       ============================================================ */
+    .edu-list { display: flex; flex-direction: column; gap: 16px; max-width: 700px; margin: 6px auto 0; text-align: left; }
+    .edu-entry { background: var(--bg-elev); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 28px; }
+    .edu-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+    .edu-school { font-size: 1.12rem; font-weight: 600; color: var(--text); }
+    .edu-when { font-size: 0.88rem; color: var(--text-faint); white-space: nowrap; }
+    .edu-degree { margin-top: 6px; color: var(--accent); font-weight: 500; font-size: 1rem; }
+    .edu-meta { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+    .edu-meta > span { color: var(--text-dim); font-size: 0.94rem; line-height: 1.4; }
+    .edu-k { display: inline-block; min-width: 62px; color: var(--text-faint); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; margin-right: 6px; }
+
+    /* ============================================================
+       9c. RELEVANT COURSEWORK — scannable grid of courses
+       ============================================================ */
+    .course-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin-top: 10px; text-align: left; }
+    .course {
+      display: flex; flex-direction: column; gap: 4px;
+      background: var(--bg-elev); border: 1px solid var(--border); border-radius: 14px; padding: 16px 20px;
+      transition: transform 0.3s var(--ease), border-color 0.3s var(--ease);
+    }
+    .course:hover { transform: translateY(-3px); border-color: rgba(255,255,255,0.2); }
+    .course-code { font-size: 0.76rem; font-weight: 600; letter-spacing: 0.08em; color: var(--accent); }
+    .course-name { color: var(--text); font-size: 0.97rem; }
+
+    /* ============================================================
+       10. SKILLS
+       ============================================================ */
+    /* Skills — one auto-scrolling carousel per category.
+       Each track holds its chips TWICE; the animation slides it by -50%
+       (exactly one copy) and loops seamlessly. Chips use margin-right
+       (not flex gap) so the two copies are perfectly periodic — that's
+       what keeps the loop from visibly jumping. */
+    .skills-stack { display: flex; flex-direction: column; gap: 20px; margin-top: 10px; }
+    .skill-row { display: flex; align-items: center; gap: 24px; }
+    .skill-cat {
+      width: 120px; flex-shrink: 0; text-align: right;
+      font-size: 0.8rem; letter-spacing: 0.14em; text-transform: uppercase;
+      color: var(--text-faint); font-weight: 600;
+    }
+    .marquee {
+      position: relative; flex: 1; min-width: 0; overflow: hidden;
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+      mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+    }
+    .marquee-track { display: flex; width: max-content; animation: marquee var(--dur, 34s) linear infinite; }
+    .marquee.rev .marquee-track { animation-direction: reverse; }
+    .marquee:hover .marquee-track { animation-play-state: paused; }
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    .chip {
+      flex-shrink: 0; white-space: nowrap; margin-right: 12px;
+      padding: 9px 18px; border-radius: 100px;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      color: var(--text-dim); font-size: 0.9rem; font-weight: 500;
+      transition: color 0.25s var(--ease), border-color 0.25s var(--ease), background 0.25s var(--ease);
+    }
+    .chip:hover { color: var(--text); border-color: rgba(255,255,255,0.22); background: rgba(255,255,255,0.07); }
+    @media (max-width: 699px) {
+      .skill-row { flex-direction: column; align-items: stretch; gap: 8px; }
+      .skill-cat { width: auto; text-align: left; }
+    }
+
+    /* ============================================================
+       11. CONTACT
+       ============================================================ */
+    .contact-links { display: flex; gap: 28px; justify-content: center; flex-wrap: wrap; }
+    .contact-links a { color: var(--text-dim); font-size: 1.05rem; transition: color 0.25s var(--ease); }
+    .contact-links a:hover { color: var(--accent); }
+    .mini-footer { position: absolute; bottom: 28px; left: 0; right: 0; text-align: center; color: var(--text-faint); font-size: 0.85rem; padding: 0 24px; }
+
+    /* ============================================================
+       12. REVEAL (per-screen content cascade)
+       ============================================================ */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+    .reveal.in { opacity: 1; transform: none; }
+    .deck-on .screen.active .reveal { opacity: 1; transform: none; }
+    .deck-on .screen:not(.active) .reveal { opacity: 0; transform: translateY(28px); }
+
+    /* ============================================================
+       13. ACCESSIBILITY
+       ============================================================ */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      .reveal, .rise, .scroll-cue { opacity: 1 !important; transform: none !important; }
+      .deck-on .tl-line { transform: scaleY(1) !important; }
+    }
+    a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+    @media (max-width: 699px) {
+      .scroll-cue { display: none; }
+      .timeline { padding-left: 96px; }
+      .tl-year { left: -96px; width: 64px; font-size: 0.75rem; }
+      .tl-line { left: 72px; }
+      .tl-dot { left: -30px; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="nebula" aria-hidden="true"></div>
+  <canvas id="stars" aria-hidden="true"></canvas>
+
+  <nav id="nav">
+    <a class="nav-name" href="#top">J.S.</a>
+    <div class="nav-links">
+      <a href="#about">About</a>
+      <a href="#education">Education</a>
+      <a href="#coursework">Coursework</a>
+      <a href="#projects">Projects</a>
+      <a href="#skills">Skills</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </nav>
+
+  <aside class="dots">
+    <a href="#top"      data-dot aria-label="Home"></a>
+    <a href="#about"    data-dot aria-label="About"></a>
+    <a href="#education" data-dot aria-label="Education"></a>
+    <a href="#coursework" data-dot aria-label="Coursework"></a>
+    <a href="#projects" data-dot aria-label="Projects"></a>
+    <a href="#skills"   data-dot aria-label="Skills"></a>
+    <a href="#contact"  data-dot aria-label="Contact"></a>
+  </aside>
+
+  <header class="screen" id="top">
+    <div class="screen-inner centered hero">
+      <div class="wrap">
+        <p class="hero-eyebrow rise">UC Berkeley · Data Science &amp; Computer Science</p>
+        <h1 class="rise">Janelle Sampson</h1>
+        <p class="buzz rise">Machine Learning&nbsp; ·&nbsp; Software Engineering</p>
+      </div>
+      <a class="scroll-cue" href="#about" aria-label="Scroll to About"><span class="line"></span>Scroll</a>
+    </div>
+  </header>
+
+  <section class="screen" id="about">
+    <div class="screen-inner centered">
+      <div class="wrap">
+        <p class="eyebrow reveal">About</p>
+        <p class="about-text reveal">
+          I work at the intersection of full-stack software engineering and 
+          data science. I design the models, build the data pipelines, and 
+          develop the user interfaces that bring them to production. Lately, that’s 
+          meant engineering machine learning systems, crafting data visualizations, and 
+          architecting clean code <strong>built to last</strong>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" id="education">
+    <div class="screen-inner centered">
+      <div class="wrap">
+        <p class="eyebrow reveal">Education</p>
+        <div class="edu-list">
+          <div class="edu-entry reveal">
+            <div class="edu-head">
+              <span class="edu-school">University of California, Berkeley</span>
+              <span class="edu-when">Expected December 2027</span>
+            </div>
+            <div class="edu-degree">Bachelor of Arts - Data Science</div>
+            <div class="edu-meta">
+              <span><span class="edu-k">Minor</span>Computer Science</span>
+            </div>
+          </div>
+          <div class="edu-entry reveal">
+            <div class="edu-head">
+              <span class="edu-school">Santa Monica College</span>
+              <span class="edu-when">June 2023</span>
+            </div>
+            <div class="edu-degree">Associate of Science - Computer Science</div>
+            <div class="edu-meta">
+              <span><span class="edu-k">Honors</span>Magna Cum Laude / High Honors · Phi Theta Kappa</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" id="coursework">
+    <div class="screen-inner">
+      <div class="wrap">
+        <p class="eyebrow reveal">Curriculum</p>
+        <h2 class="reveal">Relevant Coursework</h2>
+        <div class="course-grid">
+          <div class="course reveal"><span class="course-code">CS 61A</span><span class="course-name">Structure &amp; Interpretation of Programs</span></div>
+          <div class="course reveal"><span class="course-code">CS 61B</span><span class="course-name">Data Structures</span></div>
+          <div class="course reveal"><span class="course-code">CS 61C</span><span class="course-name">Machine Structures</span></div>
+          <div class="course reveal"><span class="course-code">CS 170</span><span class="course-name">Algorithms</span></div>
+          <div class="course reveal"><span class="course-code">CS 186</span><span class="course-name">Database Systems</span></div>
+          <div class="course reveal"><span class="course-code">CS 189</span><span class="course-name">Introduction to Machine Learning</span></div>
+          <div class="course reveal"><span class="course-code">DATA 8</span><span class="course-name">Foundations of Data Science</span></div>
+          <div class="course reveal"><span class="course-code">DATA 100</span><span class="course-name">Principles &amp; Techniques of Data Science</span></div>
+          <div class="course reveal"><span class="course-code">DATA 140</span><span class="course-name">Probability for Data Science</span></div>
+          <div class="course reveal"><span class="course-code">MATH 54</span><span class="course-name">Linear Algebra &amp; Differential Equations</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" id="projects">
+    <div class="screen-inner">
+      <div class="wrap">
+        <p class="eyebrow reveal">A line through my work</p>
+        <h2 class="reveal">Projects</h2>
+        <div class="timeline">
+          <div class="tl-line" aria-hidden="true"></div>
+
+          <article class="tl-item reveal">
+            <span class="tl-year">June 2026</span><span class="tl-dot" aria-hidden="true"></span>
+            <div class="tl-card">
+              <h3>Interactive Portfolio</h3>
+              <p>This site. A from-scratch, single-page portfolio in HTML, CSS, and JavaScript: a 
+                scroll-driven full-page section deck with a custom galactic theme and hyperspace 
+                transitions, and CSS-animated UI, built with no frameworks.</p>
+              <div class="tl-tags"><span>JavaScript</span><span>HTML</span><span>CSS</span></div>
+            </div>
+          </article>
+
+          <article class="tl-item reveal">
+            <span class="tl-year">May 2026</span><span class="tl-dot" aria-hidden="true"></span>
+            <div class="tl-card">
+              <h3>Build Your Own World (BYOW)</h3>
+              <p>An Animal Crossing themed 2D island-world engine in Java built from-scratch — seeded 
+                procedural generation for reproducible worlds, BFS pathfinding across a 4,000-tile grid, 
+                and a full game loop with undo/redo, save/load, music, and a live HUD.</p>
+              <div class="tl-tags"><span>Java</span><span>Psuedorandom Generation</span><span>BFS</span><span>Full-Stack</span></div>
+              <a class="link" href="https://github.com/Nelle868/BYOW---Animal-Crossing-Themed">View on GitHub →</a>
+            </div>
+          </article>
+
+          <article class="tl-item reveal">
+            <span class="tl-year">Apr 2026</span><span class="tl-dot" aria-hidden="true"></span>
+            <div class="tl-card">
+              <h3>Housing Price Prediction &amp; Fairness Analysis</h3>
+              <p>An end-to-end scikit-learn regression pipeline over 200K+ Cook County records 
+                reaching 0.61 log-RMSE, with from-scratch k-fold CV and a custom MAPE loss that 
+                exposed bias standard metrics hid.</p>
+              <div class="tl-tags"><span>Python</span><span>scikit-learn</span><span>Pandas</span><span>NumPy</span><span>Feature Engineering</span></div>
+              <a class="link" href="https://github.com/Nelle868/Housing-Price-Prediction-Model-and-Fairness-Analysis">View on GitHub →</a>
+            </div>
+          </article>
+
+          <article class="tl-item reveal">
+            <span class="tl-year">Apr 2026</span><span class="tl-dot" aria-hidden="true"></span>
+            <div class="tl-card">
+              <h3>WordNet Semantic Search Engine</h3>
+              <p>A full-stack semantic search engine traversing an 82K-relationship WordNet 
+                graph via BFS, indexed into HashMaps/TreeSets at startup for O(1) lookups 
+                and NGram-ranked multi-word queries.</p>
+              <div class="tl-tags"><span>Java</span><span>Graphs</span><span>Full-Stack</span><span>HTML</span><span>JavaScript</span></div>
+              <a class="link" href="https://github.com/Nelle868/WordNet-Semantic-Search-Engine">View on GitHub →</a>
+            </div>
+          </article>
+
+          <article class="tl-item reveal">
+            <span class="tl-year">Mar 2026</span><span class="tl-dot" aria-hidden="true"></span>
+            <div class="tl-card">
+              <h3>Logistic Regression Spam Classifier</h3>
+              <p>A logistic-regression spam classifier in scikit-learn with 60 engineered features 
+                that lifted accuracy from 76% to 94%, tuned via 5-fold GridSearchCV and judged on 
+                precision, recall, and false-positive rate.</p>
+              <div class="tl-tags"><span>Python</span><span>scikit-learn</span><span>Pandas</span><span>Regression</span><span>Model Training</span></div>
+              <a class="link" href="https://github.com/Nelle868/Logistic-Regression-Spam-Classifier">View on GitHub →</a>
+            </div>
+          </article>
+
+          <article class="tl-item reveal">
+            <span class="tl-year">Mar 2026</span><span class="tl-dot" aria-hidden="true"></span>
+            <div class="tl-card">
+              <h3>Percolation</h3>
+              <p>A union-find percolation simulation on an N×N grid, built test-first and paired 
+                with Monte Carlo trials to estimate the percolation threshold.</p>
+              <div class="tl-tags"><span>Java</span><span>Union-Find</span><span>Monte Carlo</span></div>
+              <a class="link" href="https://github.com/Nelle868/Percolation">View on GitHub →</a>
+            </div>
+          </article>
+
+         <article class="tl-item reveal">
+            <span class="tl-year">Mar 2026</span><span class="tl-dot" aria-hidden="true"></span>
+            <div class="tl-card">
+              <h3>Climate Change</h3>
+              <p>A Python analysis of historical temperature and precipitation data, building 99% 
+                bootstrap confidence intervals to surface warming trends and running permutation 
+                tests to assess whether drought years differ in rainfall.</p>
+              <div class="tl-tags"><span>NumPy</span><span>Bootstrap Sampling</span><span>Hypothesis Testing</span></div>
+              <a class="link" href="https://github.com/Nelle868/Climate-Change">View on GitHub →</a>
+            </div>
+          </article>
+
+          <article class="tl-item reveal">
+            <span class="tl-year">Nov 2024</span><span class="tl-dot" aria-hidden="true"></span>
+            <div class="tl-card">
+              <h3>ChatsApp</h3>
+              <p>A real-time client–server chat app in JavaFX over TCP sockets, with a 
+                dedicated reader thread marshaling updates via Platform.runLater and a 
+                styled, auto-scrolling bubble interface.</p>
+              <div class="tl-tags"><span>Java</span><span>JavaFX</span><span>Sockets</span></div>
+              <a class="link" href="https://github.com/Nelle868/ChatsApp">View on GitHub →</a>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" id="skills">
+    <div class="screen-inner">
+      <div class="wrap">
+        <p class="eyebrow reveal">Toolkit</p>
+        <h2 class="reveal">Skills</h2>
+        <div class="skills-stack">
+
+          <div class="skill-row reveal">
+            <div class="skill-cat">Languages</div>
+            <div class="marquee" style="--dur:34s">
+              <div class="marquee-track">
+                <span class="chip">C++</span><span class="chip">C</span><span class="chip">Java</span><span class="chip">Python</span><span class="chip">SQL</span><span class="chip">JavaScript</span><span class="chip">HTML</span><span class="chip">CSS</span>
+                <span class="chip" aria-hidden="true">C++</span><span class="chip" aria-hidden="true">C</span><span class="chip" aria-hidden="true">Java</span><span class="chip" aria-hidden="true">Python</span><span class="chip" aria-hidden="true">SQL</span><span class="chip" aria-hidden="true">JavaScript</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="skill-row reveal">
+            <div class="skill-cat">Tools</div>
+            <div class="marquee rev" style="--dur:38s">
+              <div class="marquee-track">
+                <span class="chip">PyCharm</span><span class="chip">Git</span><span class="chip">GitHub</span><span class="chip">IntelliJ IDEA</span><span class="chip">JavaFX</span><span class="chip">Visual Studio</span><span class="chip">Eclipse</span>
+                <span class="chip" aria-hidden="true">PyCharm</span><span class="chip" aria-hidden="true">Git</span><span class="chip" aria-hidden="true">GitHub</span><span class="chip" aria-hidden="true">IntelliJ IDEA</span><span class="chip" aria-hidden="true">JavaFX</span><span class="chip" aria-hidden="true">Visual Studio</span><span class="chip" aria-hidden="true">Eclipse</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="skill-row reveal">
+            <div class="skill-cat">Libraries</div>
+            <div class="marquee" style="--dur:44s">
+              <div class="marquee-track">
+                <span class="chip">Pandas</span><span class="chip">NumPy</span><span class="chip">Matplotlib</span><span class="chip">Seaborn</span><span class="chip">SciPy</span><span class="chip">Scikit-Learn</span>
+                <span class="chip" aria-hidden="true">Pandas</span><span class="chip" aria-hidden="true">NumPy</span><span class="chip" aria-hidden="true">Matplotlib</span><span class="chip" aria-hidden="true">Seaborn</span><span class="chip" aria-hidden="true">SciPy</span><span class="chip" aria-hidden="true">Scikit-Learn</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" id="contact">
+    <div class="screen-inner centered">
+      <div class="wrap">
+        <p class="eyebrow reveal">Contact</p>
+        <h2 class="reveal">Let's build.</h2>
+        <div class="contact-links reveal">
+          <a href="mailto:janelle.sampson@berkeley.edu">Email</a>
+          <a href="https://github.com/nelle868" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://linkedin.com/in/janellesampson/" target="_blank" rel="noopener">LinkedIn</a>
+        </div>
+      </div>
+      <div class="mini-footer">© <span id="year"></span> Janelle Sampson · Built from scratch, hosted on GitHub Pages.</div>
+    </div>
+  </section>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    /* (A) STARFIELD + WARP -------------------------------------- */
+    try {
+      (function starfield() {
+        const canvas = document.getElementById('stars');
+        const ctx = canvas.getContext('2d');
+        const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        function sprite(core) {
+          const c = document.createElement('canvas'); c.width = c.height = 32;
+          const g = c.getContext('2d');
+          const grd = g.createRadialGradient(16, 16, 0, 16, 16, 16);
+          grd.addColorStop(0, core); grd.addColorStop(0.25, core.replace('1)', '0.6)')); grd.addColorStop(1, 'rgba(255,255,255,0)');
+          g.fillStyle = grd; g.fillRect(0, 0, 32, 32); return c;
+        }
+        const sprites = [sprite('rgba(255,255,255,1)'), sprite('rgba(190,210,255,1)'), sprite('rgba(225,195,255,1)')];
+        const LAYERS = [{ speed: 0.12, size: 1.1, alpha: 0.5 }, { speed: 0.30, size: 1.8, alpha: 0.7 }, { speed: 0.55, size: 2.6, alpha: 1.0 }];
+        let w, h, dpr, stars = [], warp = 0, boost = 0;
+
+        window.__warp = function () { if (!reduce) boost = 1; };
+
+        function build() {
+          dpr = Math.min(window.devicePixelRatio || 1, 2);
+          w = window.innerWidth; h = window.innerHeight;
+          canvas.width = w * dpr; canvas.height = h * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          const total = Math.min(Math.round((w * h) / 6500), 480);
+          stars = [];
+          for (let i = 0; i < total; i++) stars.push({ x: Math.random() * w, y: Math.random() * h, layer: LAYERS[i % LAYERS.length], sprite: sprites[(Math.random() * sprites.length) | 0], phase: Math.random() * Math.PI * 2, tw: 0.6 + Math.random() * 1.2 });
+        }
+
+        function frame(t) {
+          ctx.clearRect(0, 0, w, h);
+          boost *= 0.94;
+          warp += (boost - warp) * 0.25;
+          if (warp < 0.001) warp = 0;
+          const cx = w / 2, cy = h / 2, time = t * 0.001;
+          const warping = warp > 0.02;
+          if (warping) ctx.globalCompositeOperation = 'lighter';
+
+          for (const s of stars) {
+            let y = s.y - (reduce ? 0 : time * s.layer.speed * 6);
+            y = ((y % h) + h) % h; const x = s.x;
+            if (warping) {
+              let dx = x - cx, dy = y - cy; const dist = Math.hypot(dx, dy) || 1;
+              const nx = dx / dist, ny = dy / dist;
+              const push = warp * dist * 0.45, len = warp * (60 + dist * 0.95);
+              const sx = x + nx * push, sy = y + ny * push, ex = x + nx * (push + len), ey = y + ny * (push + len);
+              ctx.globalAlpha = (0.4 + 0.6 * warp) * s.layer.alpha;
+              ctx.strokeStyle = 'rgba(208,224,255,1)'; ctx.lineWidth = Math.max(1, s.layer.size * 1.05);
+              ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey); ctx.stroke();
+              const r = s.layer.size * 1.4; ctx.drawImage(s.sprite, ex - r, ey - r, r * 2, r * 2);
+            } else {
+              const tw = reduce ? 1 : 0.55 + 0.45 * Math.sin(s.phase + time * s.tw);
+              const r = s.layer.size; ctx.globalAlpha = s.layer.alpha * tw;
+              ctx.drawImage(s.sprite, x - r, y - r, r * 2, r * 2);
+            }
+          }
+
+          // central bloom — a bright burst at the exact centre that swells
+          // with the warp, so the jump erupts from one point (blue->violet).
+          if (warping) {
+            const fr = Math.min(w, h) * (0.12 + 0.55 * warp);
+            const bloom = ctx.createRadialGradient(cx, cy, 0, cx, cy, fr);
+            bloom.addColorStop(0,    'rgba(210,222,255,' + (0.55 * warp) + ')');
+            bloom.addColorStop(0.35, 'rgba(150,150,255,' + (0.22 * warp) + ')');
+            bloom.addColorStop(1,    'rgba(150,140,255,0)');
+            ctx.globalAlpha = 1; ctx.fillStyle = bloom;
+            ctx.fillRect(0, 0, w, h);
+          }
+
+          ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+          if (!reduce) requestAnimationFrame(frame);
+        }
+        build(); window.addEventListener('resize', build, { passive: true });
+        if (reduce) frame(0); else requestAnimationFrame(frame);
+      })();
+    } catch (err) { console.error('starfield failed:', err); }
+
+    /* (B) FULL-PAGE DECK (always on) ---------------------------- */
+    (function deck() {
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const screens = Array.from(document.querySelectorAll('.screen'));
+      const dots = Array.from(document.querySelectorAll('[data-dot]'));
+      const nav = document.getElementById('nav');
+      const idOf = (el) => '#' + el.id;
+      const EDGE = 2;
+      const JUMP = reduce ? 0 : 760;       // matches the jump animation + lock
+
+      let current = Math.max(0, screens.findIndex((s) => idOf(s) === location.hash));
+      let locked = false;
+
+      const atTop = (el) => el.scrollTop <= EDGE;
+      const atBottom = (el) => el.scrollTop + el.clientHeight >= el.scrollHeight - EDGE;
+      const updateNav = () => nav.classList.toggle('scrolled', current > 0);
+      const updateDots = () => dots.forEach((d, i) => d.classList.toggle('active', i === current));
+
+      function activate(i, animate) {
+        const prev = current;
+        screens.forEach((s, idx) => {
+          if (idx === i) {
+            s.classList.remove('is-leaving');
+            s.classList.add('active');
+            s.scrollTop = 0;
+            if (animate && !reduce) { s.classList.remove('is-entering'); void s.offsetWidth; s.classList.add('is-entering'); setTimeout(() => s.classList.remove('is-entering'), JUMP); }
+            s.querySelectorAll('.reveal').forEach((el, k) => { el.style.transitionDelay = (k * 70) + 'ms'; });
+          } else if (idx === prev && prev !== i && animate && !reduce) {
+            s.classList.remove('active', 'is-entering');
+            s.classList.add('is-leaving');
+            setTimeout(() => s.classList.remove('is-leaving'), JUMP);
+          } else {
+            s.classList.remove('active', 'is-entering', 'is-leaving');
+          }
+        });
+        current = i; updateDots(); updateNav();
+        // Updating the URL hash is cosmetic; in a sandboxed frame (origin
+        // "null") replaceState throws, so never let it break navigation.
+        try { history.replaceState(null, '', idOf(screens[i])); } catch (_) {}
+      }
+
+      function goTo(i, withWarp) {
+        i = Math.max(0, Math.min(screens.length - 1, i));
+        if (withWarp && window.__warp) window.__warp();
+        activate(i, withWarp);
+      }
+      function step(dir) {
+        if (locked) return;
+        const next = current + dir;
+        if (next < 0 || next >= screens.length) return;
+        locked = true;
+        setTimeout(() => { locked = false; }, JUMP);   // guaranteed release
+        goTo(next, true);
+      }
+      function jump(i) {
+        if (locked || i === current) return;
+        locked = true;
+        setTimeout(() => { locked = false; }, JUMP);
+        goTo(i, true);
+      }
+
+      function onWheel(e) {
+        const el = screens[current];
+        const down = e.deltaY > 0;
+        if (down ? !atBottom(el) : !atTop(el)) return;   // scroll within the section first
+        e.preventDefault();
+        if (Math.abs(e.deltaY) < 12) return;
+        step(down ? 1 : -1);
+      }
+      function onKey(e) {
+        const el = screens[current];
+        if (['ArrowDown', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); if (!atBottom(el)) el.scrollBy({ top: el.clientHeight * 0.8, behavior: reduce ? 'auto' : 'smooth' }); else step(1); }
+        else if (['ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); if (!atTop(el)) el.scrollBy({ top: -el.clientHeight * 0.8, behavior: reduce ? 'auto' : 'smooth' }); else step(-1); }
+        else if (e.key === 'Home') { e.preventDefault(); jump(0); }
+        else if (e.key === 'End') { e.preventDefault(); jump(screens.length - 1); }
+      }
+      let touchY = null;
+      function onTouchStart(e) { touchY = e.touches[0].clientY; }
+      function onTouchEnd(e) {
+        if (touchY === null) return;
+        const el = screens[current];
+        const dy = touchY - e.changedTouches[0].clientY, down = dy > 0;
+        if (Math.abs(dy) > 60 && (down ? atBottom(el) : atTop(el))) step(down ? 1 : -1);
+        touchY = null;
+      }
+      window.addEventListener('wheel', onWheel, { passive: false });
+      window.addEventListener('keydown', onKey);
+      window.addEventListener('touchstart', onTouchStart, { passive: true });
+      window.addEventListener('touchend', onTouchEnd, { passive: true });
+
+      document.querySelectorAll('[data-dot], .nav-links a, .nav-name, .scroll-cue').forEach((a) => {
+        a.addEventListener('click', (e) => {
+          const href = a.getAttribute('href');
+          if (!href || href[0] !== '#') return;
+          e.preventDefault();
+          const i = screens.findIndex((s) => idOf(s) === href);
+          if (i >= 0) jump(i);
+        });
+      });
+
+      // First paint: lock the starting screen into place with an entrance.
+      document.documentElement.classList.add('deck-on');
+      activate(current, true);
+    })();
+  </script>
+
+  <!-- ============================================================
+       INTERACTIVE SKILL CAROUSELS  (self-contained; touches only .marquee)
+       Idle: each row drifts slowly on its own at the original per-row pace.
+       Mouse-wheel (or scrub/drag) over a specific row speeds THAT row up,
+       then it eases back to the drift. The wheel is consumed on the row so
+       it scrubs instead of jumping sections; use the dots, nav, arrow keys,
+       or the heading area to move between sections. Wrapped in try/catch so
+       it can never affect navigation.
+       ============================================================ -->
+  <script>
+  try {
+    (function skillScroll() {
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const clamp = (v, a, b) => (v < a ? a : (v > b ? b : v));
+      const items = [];
+
+      document.querySelectorAll('.marquee').forEach((marquee) => {
+        const track = marquee.querySelector('.marquee-track');
+        if (!track) return;
+        const unit = Array.from(track.querySelectorAll('.chip:not([aria-hidden])')).map((n) => n.cloneNode(true));
+        if (!unit.length) return;
+
+        track.style.animation = 'none';
+        track.style.willChange = 'transform';
+        marquee.style.overflow = 'hidden';
+        marquee.style.cursor = 'grab';
+        marquee.style.userSelect = 'none';
+        marquee.style.touchAction = 'pan-y';
+
+        const dur = parseFloat(getComputedStyle(marquee).getPropertyValue('--dur')) || 34; // seconds per set
+
+        const s = {
+          marquee, track, unit, dur,
+          dir: marquee.classList.contains('rev') ? -1 : 1,
+          base: 0, vel: 0, pos: 0, copy: 1,
+          dragging: false, lastX: 0, lastT: 0,
+        };
+
+        s.build = function build() {
+          track.innerHTML = '';
+          unit.forEach((n) => track.appendChild(n.cloneNode(true)));
+          s.copy = track.scrollWidth || 1;
+          let guard = 0;
+          while (track.scrollWidth < marquee.clientWidth + s.copy * 3 && guard++ < 30) {
+            unit.forEach((n) => track.appendChild(n.cloneNode(true)));
+          }
+          Array.from(track.children).forEach((c, i) => { if (i >= s.unit.length) c.setAttribute('aria-hidden', 'true'); });
+          s.base = reduce ? 0 : (s.copy / (s.dur * 60));   // match the old CSS pace
+          s.pos = s.copy;                                  // start inside the wrap band
+          s.vel = s.base * s.dir;
+          marquee.scrollLeft = s.pos;
+        };
+        s.build();
+
+        // wheel over THIS row speeds it up; consumed so the deck doesn't also jump
+        marquee.addEventListener('wheel', (e) => {
+          const d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+          s.vel = clamp(s.vel + d * 0.16, -36, 36);
+          e.preventDefault();
+          e.stopPropagation();
+        }, { passive: false });
+
+        // grab + drag to scrub, with momentum on release
+        marquee.addEventListener('pointerdown', (e) => {
+          s.dragging = true; s.lastX = e.clientX; s.lastT = performance.now(); s.vel = 0;
+          marquee.style.cursor = 'grabbing';
+          try { marquee.setPointerCapture(e.pointerId); } catch (_) {}
+        });
+        marquee.addEventListener('pointermove', (e) => {
+          if (!s.dragging) return;
+          const dx = e.clientX - s.lastX;
+          s.pos -= dx; wrapPos(s); marquee.scrollLeft = s.pos;
+          const now = performance.now(), dt = Math.max(8, now - s.lastT);
+          s.vel = clamp(-dx / dt * 16, -45, 45);
+          s.lastX = e.clientX; s.lastT = now;
+        });
+        const endDrag = (e) => { if (s.dragging) { s.dragging = false; marquee.style.cursor = 'grab'; try { marquee.releasePointerCapture(e.pointerId); } catch (_) {} } };
+        marquee.addEventListener('pointerup', endDrag);
+        marquee.addEventListener('pointercancel', endDrag);
+        marquee.addEventListener('pointerleave', endDrag);
+
+        items.push(s);
+      });
+
+      function wrapPos(s) {
+        if (s.pos >= s.copy * 2) s.pos -= s.copy;
+        else if (s.pos < s.copy) s.pos += s.copy;
+      }
+
+      function tick() {
+        for (const s of items) {
+          if (!s.dragging) {
+            s.vel += (s.base * s.dir - s.vel) * 0.05;   // ease back to the slow drift
+            s.pos += s.vel;                             // float accumulator = true position
+            wrapPos(s);
+            s.marquee.scrollLeft = s.pos;
+          }
+        }
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+
+      let rt;
+      window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => items.forEach((x) => x.build()), 200); }, { passive: true });
+    })();
+  } catch (err) { console.error('skillScroll failed:', err); }
+  </script>
+</body>
+</html>
