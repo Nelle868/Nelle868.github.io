@@ -216,6 +216,19 @@
     .course-name { color: var(--text); font-size: 0.97rem; }
 
     /* ============================================================
+       9d. EXPERIENCE — one card per role
+       ============================================================ */
+    .exp-list { display: flex; flex-direction: column; gap: 16px; max-width: 720px; margin: 6px auto 0; text-align: left; }
+    .exp-entry { background: var(--bg-elev); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 28px; }
+    .exp-head { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap; }
+    .exp-role { font-size: 1.12rem; font-weight: 600; color: var(--text); }
+    .exp-when { font-size: 0.88rem; color: var(--text-faint); white-space: nowrap; }
+    .exp-org { margin-top: 4px; color: var(--accent); font-weight: 500; font-size: 1rem; }
+    .exp-points { margin: 14px 0 0; padding-left: 18px; }
+    .exp-points li { color: var(--text-dim); font-size: 0.95rem; line-height: 1.5; margin-bottom: 6px; }
+    .exp-points li::marker { color: var(--accent); }
+ 
+    /* ============================================================
        10. SKILLS
        ============================================================ */
     /* Skills — one auto-scrolling carousel per category.
@@ -298,6 +311,7 @@
       <a href="#about">About</a>
       <a href="#education">Education</a>
       <a href="#coursework">Coursework</a>
+      <a href="#experience">Experience</a>
       <a href="#projects">Projects</a>
       <a href="#skills">Skills</a>
       <a href="#contact">Contact</a>
@@ -309,6 +323,7 @@
     <a href="#about"    data-dot aria-label="About"></a>
     <a href="#education" data-dot aria-label="Education"></a>
     <a href="#coursework" data-dot aria-label="Coursework"></a>
+    <a href="#experience" data-dot aria-label="Experience"></a>
     <a href="#projects" data-dot aria-label="Projects"></a>
     <a href="#skills"   data-dot aria-label="Skills"></a>
     <a href="#contact"  data-dot aria-label="Contact"></a>
@@ -379,7 +394,7 @@
           <div class="course reveal"><span class="course-code">CS 61A</span><span class="course-name">Structure &amp; Interpretation of Programs</span></div>
           <div class="course reveal"><span class="course-code">CS 61B</span><span class="course-name">Data Structures</span></div>
           <div class="course reveal"><span class="course-code">CS 61C</span><span class="course-name">Machine Structures</span></div>
-          <div class="course reveal"><span class="course-code">CS 170</span><span class="course-name">Algorithms</span></div>
+          <div class="course reveal"><span class="course-code">CS 70</span><span class="course-name">Discrete Mathematics and Probability Theory</span></div>
           <div class="course reveal"><span class="course-code">CS 186</span><span class="course-name">Database Systems</span></div>
           <div class="course reveal"><span class="course-code">CS 189</span><span class="course-name">Introduction to Machine Learning</span></div>
           <div class="course reveal"><span class="course-code">DATA 8</span><span class="course-name">Foundations of Data Science</span></div>
@@ -391,6 +406,27 @@
     </div>
   </section>
 
+  <section class="screen" id="Experience">
+    <div class="screen-inner centered">
+      <div class="wrap">
+        <p class="eyebrow reveal">Experience</p>
+        <div class="exp-list">
+          <div class="exp-entry reveal">
+            <div class="exp-head">
+              <span class="exp-role">Software Engineer (Intern)</span>
+              <span class="exp-when">July 2026 – Present</span>
+            </div>
+            <div class="exp-org">WithMemberly</div>
+            <ul class="exp-points">
+              <li>Build and ship user-facing features for WithMemberly's membership platform across a Next.js/React frontend, using TanStack Query for server-state management and a reusable Radix UI component library to keep the interface consistent and accessible.</li>
+              <li>Develop RESTful API endpoints in a layered Node.js/Express architecture (routes → controllers → services with DTO validation) backed by Prisma and Postgres, including Stripe integration for member and producer payment flows.</li>
+              <li>Maintain and extend CI/CD and deployment on AWS, using GitHub Actions and CodeDeploy to ship Dockerized services to EC2, with Sentry instrumentation for production error monitoring.</li>
+            </ul>
+          </div>
+      </div>
+    </div>
+  </section>
+  
   <section class="screen" id="projects">
     <div class="screen-inner">
       <div class="wrap">
@@ -516,11 +552,11 @@
           </div>
 
           <div class="skill-row reveal">
-            <div class="skill-cat">Tools</div>
+            <div class="skill-cat">Tools and Frameworks</div>
             <div class="marquee rev" style="--dur:38s">
               <div class="marquee-track">
-                <span class="chip">PyCharm</span><span class="chip">Git</span><span class="chip">GitHub</span><span class="chip">IntelliJ IDEA</span><span class="chip">JavaFX</span><span class="chip">Visual Studio</span><span class="chip">Eclipse</span>
-                <span class="chip" aria-hidden="true">PyCharm</span><span class="chip" aria-hidden="true">Git</span><span class="chip" aria-hidden="true">GitHub</span><span class="chip" aria-hidden="true">IntelliJ IDEA</span><span class="chip" aria-hidden="true">JavaFX</span><span class="chip" aria-hidden="true">Visual Studio</span><span class="chip" aria-hidden="true">Eclipse</span>
+                <span class="chip">React</span><span class="chip">Next.js</span><span class="chip">Node.js</span><span class="chip">Express.js</span><span class="chip">Prisma</span><span class="chip">TanStack Query</span><span class="chip">Radix UI</span><span class="chip">JavaFX</span><span class="chip">Git</span><span class="chip">GitHub</span><span class="chip">Docker</span><span class="chip">AWS EC2</span><span class="chip">AWS Amplify</span><span class="chip">AWS CodeDeploy</span><span class="chip">AWS IAM</span><span class="chip">Supabase</span><span class="chip">Stripe</span><span class="chip">Sentry</span>
+                <span class="chip" aria-hidden="true">React</span><span class="chip" aria-hidden="true">Next.js</span><span class="chip" aria-hidden="true">Node.js</span><span class="chip" aria-hidden="true">Express.js</span><span class="chip" aria-hidden="true">Prisma</span><span class="chip" aria-hidden="true">TanStack Query</span><span class="chip" aria-hidden="true">Radix UI</span><span class="chip" aria-hidden="true">JavaFX</span><span class="chip" aria-hidden="true">Git</span><span class="chip" aria-hidden="true">GitHub</span><span class="chip" aria-hidden="true">Docker</span><span class="chip" aria-hidden="true">AWS EC2</span><span class="chip" aria-hidden="true">AWS Amplify</span><span class="chip" aria-hidden="true">AWS CodeDeploy</span><span class="chip" aria-hidden="true">AWS IAM</span><span class="chip" aria-hidden="true">Supabase</span><span class="chip" aria-hidden="true">Stripe</span><span class="chip" aria-hidden="true">Sentry</span>
               </div>
             </div>
           </div>
