@@ -345,11 +345,11 @@
       <div class="wrap">
         <p class="eyebrow reveal">About</p>
         <p class="about-text reveal">
-          I work at the intersection of full-stack software engineering and 
-          data science. I design the models, build the data pipelines, and 
-          develop the user interfaces that bring them to production. Lately, that’s 
-          meant engineering machine learning systems, crafting data visualizations, and 
-          architecting clean code <strong>built to last</strong>.
+          I work at the intersection of full-stack engineering and machine learning. 
+          I build the models, the pipelines that feed them, and the systems that put 
+          them in front of users. Lately that's meant retrieval and embedding work, 
+          evaluation harnesses that keep the results honest, and backend architecture 
+          <strong>built to last</strong>.
         </p>
       </div>
     </div>
@@ -394,8 +394,12 @@
           <div class="course reveal"><span class="course-code">CS 61A</span><span class="course-name">Structure &amp; Interpretation of Programs</span></div>
           <div class="course reveal"><span class="course-code">CS 61B</span><span class="course-name">Data Structures</span></div>
           <div class="course reveal"><span class="course-code">CS 61C</span><span class="course-name">Machine Structures</span></div>
+          <div class="course reveal"><span class="course-code">CS 70</span><span class="course-name">Discrete Math and Probability Theory (Planned)</span></div>
+          <div class="course reveal"><span class="course-code">CS 170</span><span class="course-name">Algorithms (Planned)</span></div>
+          <div class="course reveal"><span class="course-code">CS 182</span><span class="course-name">Deep Learning (Planned)</span></div>
           <div class="course reveal"><span class="course-code">CS 186</span><span class="course-name">Database Systems</span></div>
           <div class="course reveal"><span class="course-code">CS 189</span><span class="course-name">Introduction to Machine Learning</span></div>
+          <div class="course reveal"><span class="course-code">EECS 183</span><span class="course-name">Natural Language Processing (Planned)</span></div>
           <div class="course reveal"><span class="course-code">DATA 8</span><span class="course-name">Foundations of Data Science</span></div>
           <div class="course reveal"><span class="course-code">DATA 100</span><span class="course-name">Principles &amp; Techniques of Data Science</span></div>
           <div class="course reveal"><span class="course-code">DATA 140</span><span class="course-name">Probability for Data Science</span></div>
@@ -417,9 +421,41 @@
             </div>
             <div class="exp-org">WithMemberly</div>
             <ul class="exp-points">
+              <li>Build an LLM recommendation assistant on the Anthropic API with streaming responses, live web search, and producer-context retrieval.</li>
               <li>Build and ship user-facing features for WithMemberly's membership platform across a Next.js/React frontend, using TanStack Query for server-state management and a reusable Radix UI component library to keep the interface consistent and accessible.</li>
               <li>Develop RESTful API endpoints in a layered Node.js/Express architecture (routes → controllers → services with DTO validation) backed by Prisma and Postgres, including Stripe integration for member and producer payment flows.</li>
               <li>Maintain and extend CI/CD and deployment on AWS, using GitHub Actions and CodeDeploy to ship Dockerized services to EC2, with Sentry instrumentation for production error monitoring.</li>
+            </ul>
+          </div>
+      </div>
+    </div>
+  </section>
+
+    <section class="screen" id="experience">
+    <div class="screen-inner centered">
+      <div class="wrap">
+        <p class="eyebrow reveal">Research</p>
+        <div class="exp-list">
+          <div class="exp-entry reveal">
+            <div class="exp-head">
+              <span class="exp-role">Global Opportunity Lab | URAP</span>
+              <span class="exp-when">September 2026 – Present</span>
+            </div>
+            <div class="exp-org">Mentor: Prof. Joshua Blumenstock</div>
+            <ul class="exp-points">
+              <li>Applying deep learning to satellite imagery for Sand Mining Watch, developing semi-supervised models to detect illegal sand mining in India under limited ground-truth labels.</li>
+            </ul>
+          </div>
+          <div class="exp-entry reveal">
+            <div class="exp-head">
+              <span class="exp-role">NIST Center for Neutron Research</span>
+              <span class="exp-when">August 2026 – Present</span>
+            </div>
+            <div class="exp-org">Mentor: Dr. William Ratcliff</div>
+            <ul class="exp-points">
+              <li>Building a neural retrieval system that matches noisy X-ray diffraction signals to a database of known crystal structures, training PyTorch dual encoders with contrastive and ranking losses and serving embeddings via ANN vector search.</li>
+              <li>Benchmarking learned embeddings against classical similarity and optimal-transport baselines, using leakage-aware train/test splits to prevent data leakage across related samples.</li>
+              <li>Evaluating robustness to distribution shift, noise, missing features, and mixed-source inputs, with open-set rejection for out-of-distribution queries and interpretable match explanations.</li>
             </ul>
           </div>
       </div>
